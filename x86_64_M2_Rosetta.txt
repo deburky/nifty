@@ -1,0 +1,1 @@
+arch -x86_64 python graph_data_preparation.py --dataset credit
