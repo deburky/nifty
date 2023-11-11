@@ -26,10 +26,9 @@ class JK(nn.Module):
                 m.bias.data.fill_(0.0)
 
     def forward(self, x, edge_index): 
-        xs = []
         x = self.conv1(x, edge_index)
         x = self.transition(x)
-        xs.append(x)
+        xs = [x]
         for _ in range(1): 
             x = self.convx(x, edge_index)
             x = self.transition(x)

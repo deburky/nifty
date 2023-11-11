@@ -80,11 +80,11 @@ class ProGNN:
                 self.train_gcn(epoch, features, estimator.estimated_adj,
                         labels, idx_train, idx_val)
             else:
-                for i in range(int(args.outer_steps)):
+                for _ in range(int(args.outer_steps)):
                     self.train_adj(epoch, features, adj, labels,
                             idx_train, idx_val)
 
-                for i in range(int(args.inner_steps)):
+                for _ in range(int(args.inner_steps)):
                     self.train_gcn(epoch, features, estimator.estimated_adj,
                             labels, idx_train, idx_val)
 
@@ -263,8 +263,7 @@ class ProGNN:
         L = r_mat_inv @ L @ r_mat_inv
 
         XLXT = torch.matmul(torch.matmul(X.t(), L), X)
-        loss_smooth_feat = torch.trace(XLXT)
-        return loss_smooth_feat
+        return torch.trace(XLXT)
 
 
 class EstimateAdj(nn.Module):
@@ -295,8 +294,7 @@ class EstimateAdj(nn.Module):
         else:
             adj = self.estimated_adj
 
-        normalized_adj = self._normalize(adj + torch.eye(adj.shape[0]).to(self.device))
-        return normalized_adj
+        return self._normalize(adj + torch.eye(adj.shape[0]).to(self.device))
 
     def _normalize(self, mx):
         rowsum = mx.sum(1)

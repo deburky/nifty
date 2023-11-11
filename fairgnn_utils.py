@@ -14,9 +14,7 @@ def encode_onehot(labels):
     classes = set(labels)
     classes_dict = {c: np.identity(len(classes))[i, :] for i, c in
                     enumerate(classes)}
-    labels_onehot = np.array(list(map(classes_dict.get, labels)),
-                             dtype=np.int32)
-    return labels_onehot
+    return np.array(list(map(classes_dict.get, labels)), dtype=np.int32)
 
 
 def build_relationship(x, thresh=0.25):
@@ -29,18 +27,13 @@ def build_relationship(x, thresh=0.25):
         import random
         random.seed(912)
         random.shuffle(neig_id)
-        for neig in neig_id[:200]:
-            if neig != ind:
-                idx_map.append([ind, neig])
-    # print('building edge relationship complete')
-    idx_map =  np.array(idx_map)
-    
-    return idx_map
+        idx_map.extend([ind, neig] for neig in neig_id[:200] if neig != ind)
+    return np.array(idx_map)
 
 
 def load_credit(dataset, sens_attr="Age", predict_attr="NoDefaultNextMonth", path="./dataset/credit/", label_number=1000, sens_number=100):
     # print('Loading {} dataset from {}'.format(dataset, path))
-    idx_features_labels = pd.read_csv(os.path.join(path,"{}.csv".format(dataset)))
+    idx_features_labels = pd.read_csv(os.path.join(path, f"{dataset}.csv"))
     header = list(idx_features_labels.columns)
     header.remove(predict_attr)
     header.remove('Single')
@@ -107,16 +100,16 @@ def load_credit(dataset, sens_attr="Age", predict_attr="NoDefaultNextMonth", pat
     random.seed(20)
     random.shuffle(idx_sens_train)
     idx_sens_train = torch.LongTensor(idx_sens_train[:sens_number])
-   
+
     return adj, features, labels, idx_train, idx_val, idx_test, sens, idx_sens_train
 
 
 def load_bail(dataset, sens_attr="WHITE", predict_attr="RECID", path="../dataset/bail/", label_number=1000, sens_number=100):
     # print('Loading {} dataset from {}'.format(dataset, path))
-    idx_features_labels = pd.read_csv(os.path.join(path,"{}.csv".format(dataset)))
+    idx_features_labels = pd.read_csv(os.path.join(path, f"{dataset}.csv"))
     header = list(idx_features_labels.columns)
     header.remove(predict_attr)
-    
+
     # # Normalize School
     # idx_features_labels['SCHOOL'] = 2*(idx_features_labels['SCHOOL']-idx_features_labels['SCHOOL'].min()).div(idx_features_labels['SCHOOL'].max() - idx_features_labels['SCHOOL'].min()) - 1
 
@@ -181,13 +174,13 @@ def load_bail(dataset, sens_attr="WHITE", predict_attr="RECID", path="../dataset
     random.seed(20)
     random.shuffle(idx_sens_train)
     idx_sens_train = torch.LongTensor(idx_sens_train[:sens_number])
-    
+
     return adj, features, labels, idx_train, idx_val, idx_test, sens, idx_sens_train
 
 
 def load_german(dataset, sens_attr="Gender", predict_attr="GoodCustomer", path="../dataset/german/", label_number=1000, sens_number=100):
     # print('Loading {} dataset from {}'.format(dataset, path))
-    idx_features_labels = pd.read_csv(os.path.join(path,"{}.csv".format(dataset)))
+    idx_features_labels = pd.read_csv(os.path.join(path, f"{dataset}.csv"))
     header = list(idx_features_labels.columns)
     header.remove(predict_attr)
     header.remove('OtherLoansAtStore')
@@ -260,7 +253,7 @@ def load_german(dataset, sens_attr="Gender", predict_attr="GoodCustomer", path="
     idx_train = torch.LongTensor(idx_train)
     idx_val = torch.LongTensor(idx_val)
     idx_test = torch.LongTensor(idx_test)
-   
+
     return adj, features, labels, idx_train, idx_val, idx_test, sens, idx_sens_train
 
 

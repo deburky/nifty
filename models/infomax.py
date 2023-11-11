@@ -42,5 +42,4 @@ class GraphInfoMax(nn.Module):
 
     def forward(self, x, edge_index): 
         pos_z, neg_z, summary = self.dgi_model(x, edge_index)
-        output = self.cls_model(pos_z, edge_index)
-        return output
+        return self.cls_model(pos_z, edge_index)

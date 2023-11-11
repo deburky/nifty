@@ -19,8 +19,7 @@ class Classifier(nn.Module):
         self.fc1 = spectral_norm(nn.Linear(ft_in, nb_classes))
 
     def forward(self, seq):
-        ret = self.fc1(seq)
-        return ret
+        return self.fc1(seq)
 
 
 class GCN(nn.Module):
@@ -70,10 +69,9 @@ class JK(nn.Module):
                 m.bias.data.fill_(0.0)
 
     def forward(self, x, edge_index):
-        xs = []
         x = self.conv1(x, edge_index)
         x = self.transition(x)
-        xs.append(x)
+        xs = [x]
         for _ in range(1):
             x = self.convx(x, edge_index)
             x = self.transition(x)
@@ -282,10 +280,7 @@ class SSF(torch.nn.Module):
         # predictor
         h1 = self.prediction(p1)
 
-        # classifier
-        c1 = self.classifier(emb)
-
-        return c1
+        return self.classifier(emb)
 
     def linear_eval(self, emb, labels, idx_train, idx_test):
         x = emb.detach()

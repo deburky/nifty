@@ -113,9 +113,7 @@ class GaussianConvolution(Module):
         # return output + self.bias
 
     def __repr__(self):
-        return self.__class__.__name__ + ' (' \
-               + str(self.in_features) + ' -> ' \
-               + str(self.out_features) + ')'
+        return f'{self.__class__.__name__} ({str(self.in_features)} -> {str(self.out_features)})'
 
 
 class RobustGCN(Module):
@@ -151,8 +149,7 @@ class RobustGCN(Module):
         # ipdb.set_trace()
         miu, sigma = self.gc1(features.to(self.device), self.adj_norm1.to(self.device), self.adj_norm2.to(self.device), self.gamma)
         miu, sigma = self.gc2(miu, sigma, self.adj_norm1.to(self.device), self.adj_norm2.to(self.device), self.gamma)
-        output = miu + self.gaussian.sample().to(self.device) * torch.sqrt(sigma + 1e-8)
-        return output  # F.log_softmax(output, dim=1)
+        return miu + self.gaussian.sample().to(self.device) * torch.sqrt(sigma + 1e-8)
 
 
     def fit(self, features, adj, labels, idx_train, idx_val=None, idx_test=None, train_iters=1000, verbose=True, attention=None):
@@ -180,7 +177,7 @@ class RobustGCN(Module):
             loss_train.backward()
             optimizer.step()
             if verbose and i % 100 == 0:
-                print('Epoch {}, training loss: {}'.format(i, loss_train.item()))
+                print(f'Epoch {i}, training loss: {loss_train.item()}')
 
         self.eval()
         output = self.forward()
@@ -192,7 +189,7 @@ class RobustGCN(Module):
         best_loss_val = 100
         best_acc_val = 0
         import tqdm
-        for i in tqdm.tqdm(range(train_iters)):
+        for _ in tqdm.tqdm(range(train_iters)):
             torch.cuda.empty_cache()
             self.train()
             optimizer.zero_grad()
@@ -244,8 +241,9 @@ class RobustGCN(Module):
         # ipdb.set_trace()
         miu, sigma = self.gc1(features.to('cpu'), self.adj_norm1.to('cpu'), self.adj_norm2.to('cpu'), self.gamma)
         miu, sigma = self.gc2(miu.to('cpu'), sigma.to('cpu'), self.adj_norm1.to('cpu'), self.adj_norm2.to('cpu'), self.gamma)
-        output = miu.to('cpu') + self.gaussian.sample().to('cpu') * torch.sqrt(sigma + 1e-8)
-        return output
+        return miu.to('cpu') + self.gaussian.sample().to('cpu') * torch.sqrt(
+            sigma + 1e-8
+        )
 
     def _loss(self, input, labels):
         loss = F.binary_cross_entropy_with_logits(input[:, 0], labels.float())  # double())  # F.binary_cross_entropy_with_logits(input, labels)
